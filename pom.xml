@@ -26,7 +26,7 @@
 
     <!-- dependency versions -->
     <jmeter.version>5.4.3</jmeter.version>
-    <amqp.client.version>5.14.2</amqp.client.version>
+    <amqp.client.version>5.15.0</amqp.client.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
     <slf4j.version>1.7.36</slf4j.version>
 
