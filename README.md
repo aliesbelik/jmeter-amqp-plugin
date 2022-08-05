@@ -3,6 +3,7 @@
 [![build status](https://img.shields.io/github/workflow/status/aliesbelik/jmeter-amqp-plugin/CI?label=build&color=18BA91&style=flat-square)](https://github.com/aliesbelik/jmeter-amqp-plugin/actions/workflows/maven.yml)
 [![release](https://img.shields.io/github/v/release/aliesbelik/jmeter-amqp-plugin?label=release&color=18BA91&style=flat-square)](https://github.com/aliesbelik/jmeter-amqp-plugin/releases/latest)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?color=18BA91&style=flat-square)](https://github.com/aliesbelik/jmeter-amqp-plugin/issues)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Faliesbelik%2Fjmeter-amqp-plugin.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Faliesbelik%2Fjmeter-amqp-plugin?ref=badge_shield)
 
 A [JMeter](http://jmeter.apache.org/) plugin to publish & consume messages from [RabbitMQ](http://www.rabbitmq.com/)
 or any [AMQP](http://www.amqp.org/) message broker.
@@ -100,3 +101,7 @@ Thanks to
 Contributions are welcome.\
 [Raise an issue](https://github.com/aliesbelik/jmeter-amqp-plugin/issues), [open a pull request](https://github.com/aliesbelik/jmeter-amqp-plugin/pulls),
 or [start a discussion](https://github.com/aliesbelik/jmeter-amqp-plugin/discussions) with your ideas.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Faliesbelik%2Fjmeter-amqp-plugin.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Faliesbelik%2Fjmeter-amqp-plugin?ref=badge_large)
