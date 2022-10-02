@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* App_id message property for AMQP Publisher (see [jlavallee#37](https://github.com/jlavallee/JMeter-Rabbit-AMQP/issues/37)).
+
 ### Dependency Updates
 
 * Up amqp-client version to 5.16.0.

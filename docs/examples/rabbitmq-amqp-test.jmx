@@ -81,6 +81,7 @@
           <stringProp name="AMQPPublisher.ContentType">application/json</stringProp>
           <stringProp name="AMQPPublisher.ContentEncoding">utf-8</stringProp>
           <stringProp name="AMQPPublisher.MessageId"></stringProp>
+          <stringProp name="AMQPPublisher.AppId"></stringProp>
           <elementProp name="AMQPPublisher.Headers" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
             <collectionProp name="Arguments.arguments">
               <elementProp name="cc" elementType="Argument">

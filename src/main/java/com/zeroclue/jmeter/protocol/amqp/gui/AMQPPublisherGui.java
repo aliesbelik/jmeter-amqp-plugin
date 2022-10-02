@@ -32,6 +32,7 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
     private final JLabeledTextField messagePriority = new JLabeledTextField(" Message Priority");
     private final JLabeledTextField contentType = new JLabeledTextField("        Content-Type");
     private final JLabeledTextField contentEncoding = new JLabeledTextField("Content Encoding");
+    private final JLabeledTextField appId = new JLabeledTextField("       Application ID");
 
     private final JCheckBox persistent = new JCheckBox("Persistent", AMQPPublisher.DEFAULT_PERSISTENT);
     private final JCheckBox useTx = new JCheckBox("Use Transactions", AMQPPublisher.DEFAULT_USE_TX);
@@ -83,6 +84,7 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
         messagePriority.setText(sampler.getMessagePriority());
         messageId.setText(sampler.getMessageId());
         message.setText(sampler.getMessage());
+        appId.setText(sampler.getAppId());
 
         configureHeaders(sampler);
     }
@@ -121,6 +123,7 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
         sampler.setContentType(contentType.getText());
         sampler.setContentEncoding(contentEncoding.getText());
         sampler.setMessageId(messageId.getText());
+        sampler.setAppId(appId.getText());
 
         sampler.setHeaders((Arguments) headers.createTestElement());
     }
@@ -183,6 +186,7 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
         propertyPanel.add(correlationId, constraints);
         propertyPanel.add(messageId, constraints);
         propertyPanel.add(messagePriority, constraints);
+        propertyPanel.add(appId, constraints);
         propertyPanel.add(contentType, constraints);
         propertyPanel.add(contentEncoding, constraints);
 
@@ -206,6 +210,7 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
         contentEncoding.setText(AMQPPublisher.DEFAULT_ENCODING);
         messageId.setText("");
         message.setText("");
+        appId.setText("");
         headers.clearGui();
     }
 

@@ -50,6 +50,7 @@ public class AMQPPublisher extends AMQPSampler implements Interruptible {
     private static final String HEADERS             = "AMQPPublisher.Headers";
     private static final String PERSISTENT          = "AMQPPublisher.Persistent";
     private static final String USE_TX              = "AMQPPublisher.UseTx";
+    private static final String APP_ID              = "AMQPPublisher.AppId";
 
     public static final boolean DEFAULT_PERSISTENT   = false;
     public static final boolean DEFAULT_USE_TX       = false;
@@ -264,6 +265,14 @@ public class AMQPPublisher extends AMQPSampler implements Interruptible {
         setProperty(USE_TX, tx);
     }
 
+    public String getAppId() {
+        return getPropertyAsString(APP_ID);
+    }
+
+    public void setAppId(String appId) {
+        setProperty(APP_ID, appId);
+    }
+
     @Override
     public boolean interrupt() {
         cleanup();
@@ -301,6 +310,10 @@ public class AMQPPublisher extends AMQPSampler implements Interruptible {
             builder.priority(getMessagePriorityAsInt());
         } else {
             builder.priority(DEFAULT_MESSAGE_PRIORITY);
+        }
+
+        if (getAppId() != null && !getAppId().isEmpty()) {
+            builder.appId(getAppId());
         }
 
         return builder.build();

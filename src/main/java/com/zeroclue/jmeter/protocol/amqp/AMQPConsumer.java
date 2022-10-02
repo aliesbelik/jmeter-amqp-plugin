@@ -48,6 +48,7 @@ public class AMQPConsumer extends AMQPSampler implements Interruptible, TestStat
     public static final String EXCHANGE_PARAMETER       = "Exchange";
     public static final String ROUTING_KEY_PARAMETER    = "Routing Key";
     public static final String DELIVERY_TAG_PARAMETER   = "Delivery Tag";
+    public static final String APP_ID_PARAMETER         = "Application ID";
 
     public static final boolean DEFAULT_PURGE_QUEUE = false;
     public static final boolean DEFAULT_AUTO_ACK = true;
@@ -380,6 +381,13 @@ public class AMQPConsumer extends AMQPSampler implements Interruptible, TestStat
             .append(": ")
             .append(delivery.getEnvelope().getDeliveryTag())
             .append("\n");
+
+        if (delivery.getProperties().getAppId() != null) {
+            sb.append(APP_ID_PARAMETER)
+                .append(": ")
+                .append(delivery.getProperties().getAppId())
+                .append("\n");
+        }
 
         if (headers != null) {
             for (Map.Entry<String,Object> entry : headers.entrySet()) {
