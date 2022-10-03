@@ -28,7 +28,7 @@
     <jmeter.version>5.5</jmeter.version>
     <amqp.client.version>5.16.0</amqp.client.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
-    <slf4j.version>2.0.1</slf4j.version>
+    <slf4j.version>2.0.3</slf4j.version>
 
     <!-- plugin versions -->
     <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
