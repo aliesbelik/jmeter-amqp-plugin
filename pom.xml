@@ -25,7 +25,7 @@
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
 
     <!-- dependency versions -->
-    <jmeter.version>5.6</jmeter.version>
+    <jmeter.version>5.6.2</jmeter.version>
     <amqp.client.version>5.18.0</amqp.client.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
     <slf4j.version>2.0.7</slf4j.version>
