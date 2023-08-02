@@ -37,7 +37,7 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
     private final JCheckBox persistent = new JCheckBox("Persistent", AMQPPublisher.DEFAULT_PERSISTENT);
     private final JCheckBox useTx = new JCheckBox("Use Transactions", AMQPPublisher.DEFAULT_USE_TX);
 
-    private final ArgumentsPanel headers = new ArgumentsPanel("Headers");
+    private final ArgumentsPanel headers = new AMQPHeadersPanel("Headers");
 
     private static final String MSG_SETTINGS_LABEL = "Message";
     private static final String PROPS_SETTINGS_LABEL = "Properties";
