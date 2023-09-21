@@ -5,9 +5,11 @@ import com.zeroclue.jmeter.protocol.amqp.AMQPPublisher;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import org.apache.jmeter.config.Arguments;
 import org.apache.jmeter.config.gui.ArgumentsPanel;
@@ -24,6 +26,7 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
     private static final long serialVersionUID = 1L;
 
     private final JLabeledTextArea message = new JLabeledTextArea("Message Content");
+
     private final JLabeledTextField messageRoutingKey = new JLabeledTextField("          Routing Key");
     private final JLabeledTextField messageType = new JLabeledTextField("     Message Type");
     private final JLabeledTextField replyToQueue = new JLabeledTextField("   Reply-To Queue");
@@ -34,6 +37,7 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
     private final JLabeledTextField contentEncoding = new JLabeledTextField("Content Encoding");
     private final JLabeledTextField appId = new JLabeledTextField("       Application ID");
 
+    private final JCheckBox timestamp = new JCheckBox("Timestamp", AMQPPublisher.DEFAULT_TIMESTAMP);
     private final JCheckBox persistent = new JCheckBox("Persistent", AMQPPublisher.DEFAULT_PERSISTENT);
     private final JCheckBox useTx = new JCheckBox("Use Transactions", AMQPPublisher.DEFAULT_USE_TX);
 
@@ -85,6 +89,7 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
         messageId.setText(sampler.getMessageId());
         message.setText(sampler.getMessage());
         appId.setText(sampler.getAppId());
+        timestamp.setSelected(sampler.getTimestamp());
 
         configureHeaders(sampler);
     }
@@ -124,6 +129,7 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
         sampler.setContentEncoding(contentEncoding.getText());
         sampler.setMessageId(messageId.getText());
         sampler.setAppId(appId.getText());
+        sampler.setTimestamp(timestamp.isSelected());
 
         sampler.setHeaders((Arguments) headers.createTestElement());
     }
@@ -180,6 +186,10 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
         JPanel propertyPanel = new JPanel(new GridBagLayout());
         propertyPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), PROPS_SETTINGS_LABEL));
 
+        timestamp.setHorizontalTextPosition(SwingConstants.LEFT);
+        //timestamp.setHorizontalTextPosition(SwingConstants.LEADING);
+        timestamp.setIconTextGap(35);
+
         propertyPanel.add(messageRoutingKey, constraints);
         propertyPanel.add(replyToQueue, constraints);
         propertyPanel.add(messageType, constraints);
@@ -189,6 +199,7 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
         propertyPanel.add(appId, constraints);
         propertyPanel.add(contentType, constraints);
         propertyPanel.add(contentEncoding, constraints);
+        propertyPanel.add(timestamp, constraints);
 
         return propertyPanel;
     }
@@ -199,6 +210,7 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
     @Override
     public void clearGui() {
         super.clearGui();
+
         persistent.setSelected(AMQPPublisher.DEFAULT_PERSISTENT);
         useTx.setSelected(AMQPPublisher.DEFAULT_USE_TX);
         messageRoutingKey.setText("");
@@ -211,6 +223,8 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
         messageId.setText("");
         message.setText("");
         appId.setText("");
+        timestamp.setSelected(AMQPPublisher.DEFAULT_TIMESTAMP);
+
         headers.clearGui();
     }
 

@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -51,9 +53,11 @@ public class AMQPPublisher extends AMQPSampler implements Interruptible {
     private static final String PERSISTENT          = "AMQPPublisher.Persistent";
     private static final String USE_TX              = "AMQPPublisher.UseTx";
     private static final String APP_ID              = "AMQPPublisher.AppId";
+    private static final String TIMESTAMP           = "AMQPPublisher.Timestamp";
 
     public static final boolean DEFAULT_PERSISTENT   = false;
     public static final boolean DEFAULT_USE_TX       = false;
+    public static final boolean DEFAULT_TIMESTAMP    = true;
     public static final int DEFAULT_MESSAGE_PRIORITY = 0;
     public static final String DEFAULT_RESPONSE_CODE = "500";
     public static final String DEFAULT_CONTENT_TYPE  = "text/plain";
@@ -273,6 +277,14 @@ public class AMQPPublisher extends AMQPSampler implements Interruptible {
         setProperty(APP_ID, appId);
     }
 
+    public boolean getTimestamp() {
+        return getPropertyAsBoolean(TIMESTAMP, DEFAULT_TIMESTAMP);
+    }
+
+    public void setTimestamp(Boolean ts) {
+        setProperty(TIMESTAMP, ts);
+    }
+
     @Override
     public boolean interrupt() {
         cleanup();
@@ -314,6 +326,10 @@ public class AMQPPublisher extends AMQPSampler implements Interruptible {
 
         if (getAppId() != null && !getAppId().isEmpty()) {
             builder.appId(getAppId());
+        }
+
+        if (getTimestamp()) {
+            builder.timestamp(Date.from(Instant.now()));
         }
 
         return builder.build();

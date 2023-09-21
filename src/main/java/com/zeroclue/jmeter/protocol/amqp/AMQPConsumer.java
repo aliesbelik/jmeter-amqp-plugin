@@ -365,10 +365,13 @@ public class AMQPConsumer extends AMQPSampler implements Interruptible, TestStat
         Map<String, Object> headers = delivery.getProperties().getHeaders();
         StringBuilder sb = new StringBuilder();
 
-        sb.append(TIMESTAMP_PARAMETER)
-            .append(": ")
-            .append(delivery.getProperties().getTimestamp() != null ? delivery.getProperties().getTimestamp().getTime() : "")
-            .append("\n");
+        if (delivery.getProperties().getTimestamp() != null) {
+            sb.append(TIMESTAMP_PARAMETER)
+                .append(": ")
+                .append((delivery.getProperties().getTimestamp().getTime())/1000)
+                .append("\n");
+        }
+
         sb.append(EXCHANGE_PARAMETER)
             .append(": ")
             .append(delivery.getEnvelope().getExchange())
