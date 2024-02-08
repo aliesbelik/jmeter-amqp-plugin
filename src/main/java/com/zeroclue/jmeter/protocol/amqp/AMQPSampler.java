@@ -51,6 +51,7 @@ public abstract class AMQPSampler extends AbstractSampler implements ThreadListe
     private static final String QUEUE_REDECLARE         = "AMQPSampler.Redeclare";
     private static final String QUEUE_EXCLUSIVE         = "AMQPSampler.QueueExclusive";
     private static final String QUEUE_AUTO_DELETE       = "AMQPSampler.QueueAutoDelete";
+    private static final String QUEUE_QUORUM            = "AMQPSampler.QueueQuorum";
 
     public static final String[] EXCHANGE_TYPES = new String[] {
         "direct",
@@ -74,6 +75,7 @@ public abstract class AMQPSampler extends AbstractSampler implements ThreadListe
     public static final boolean DEFAULT_QUEUE_AUTO_DELETE = false;
     public static final boolean DEFAULT_QUEUE_REDECLARE = false;
     public static final boolean DEFAULT_QUEUE_EXCLUSIVE = false;
+    public static final boolean DEFAULT_QUEUE_QUORUM = false;
 
     public static final String DEFAULT_MSG_TTL = "";
     public static final String DEFAULT_MSG_EXPIRES = "";
@@ -169,6 +171,10 @@ public abstract class AMQPSampler extends AbstractSampler implements ThreadListe
 
     private Map<String, Object> getQueueArguments() {
         Map<String, Object> arguments = new HashMap<>();
+
+        if (queueQuorum()) {
+            arguments.put("x-queue-type", "quorum");
+        }
 
         if (getMessageTTL() != null && !getMessageTTL().isEmpty()) {
             arguments.put("x-message-ttl", getMessageTTLAsInt());
@@ -465,6 +471,25 @@ public abstract class AMQPSampler extends AbstractSampler implements ThreadListe
 
     public boolean queueAutoDelete() {
         return getPropertyAsBoolean(QUEUE_AUTO_DELETE);
+    }
+
+    /**
+     * @return whether the queue should be of type quorum
+     */
+    public String getQueueQuorum() {
+        return getPropertyAsString(QUEUE_QUORUM);
+    }
+
+    public void setQueueQuorum(String content) {
+        setProperty(QUEUE_QUORUM, content);
+    }
+
+    public void setQueueQuorum(Boolean value) {
+        setProperty(QUEUE_QUORUM, value.toString());
+    }
+
+    public boolean queueQuorum() {
+        return getPropertyAsBoolean(QUEUE_QUORUM);
     }
 
     /**
