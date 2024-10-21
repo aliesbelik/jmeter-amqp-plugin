@@ -32,7 +32,7 @@
     <jmeter.plugins.cmn.version>0.7</jmeter.plugins.cmn.version>
 
     <!-- plugin versions -->
-    <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
+    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
     <maven-shade-plugin.version>3.5.1</maven-shade-plugin.version>
   </properties>
 
