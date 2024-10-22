@@ -44,6 +44,7 @@ public abstract class AMQPSamplerGui extends AbstractSamplerGui {
     protected final JCheckBox queueRedeclare = new JCheckBox("Redeclare", AMQPSampler.DEFAULT_QUEUE_REDECLARE);
     protected final JCheckBox queueExclusive = new JCheckBox("Exclusive", AMQPSampler.DEFAULT_QUEUE_EXCLUSIVE);
     protected final JCheckBox queueAutoDelete = new JCheckBox("Auto Delete", AMQPSampler.DEFAULT_QUEUE_AUTO_DELETE);
+    protected final JCheckBox queueQuorum = new JCheckBox("Quorum", AMQPSampler.DEFAULT_QUEUE_QUORUM);
 
     protected JLabeledTextField virtualHost = new JLabeledTextField("Virtual Host");
     protected JLabeledTextField host = new JLabeledTextField("             Host");
@@ -91,6 +92,7 @@ public abstract class AMQPSamplerGui extends AbstractSamplerGui {
         queueRedeclare.setSelected(sampler.getQueueRedeclare());
         queueAutoDelete.setSelected(sampler.queueAutoDelete());
         queueExclusive.setSelected(sampler.queueExclusive());
+        queueQuorum.setSelected(sampler.queueQuorum());
 
         virtualHost.setText(sampler.getVirtualHost());
         host.setText(sampler.getHost());
@@ -127,6 +129,7 @@ public abstract class AMQPSamplerGui extends AbstractSamplerGui {
         queueRedeclare.setSelected(AMQPSampler.DEFAULT_QUEUE_REDECLARE);
         queueAutoDelete.setSelected(AMQPSampler.DEFAULT_QUEUE_AUTO_DELETE);
         queueExclusive.setSelected(AMQPSampler.DEFAULT_QUEUE_EXCLUSIVE);
+        queueQuorum.setSelected(AMQPSampler.DEFAULT_QUEUE_QUORUM);
 
         virtualHost.setText(AMQPSampler.DEFAULT_VIRTUAL_HOST);
         host.setText(AMQPSampler.DEFAULT_HOSTNAME);
@@ -165,6 +168,7 @@ public abstract class AMQPSamplerGui extends AbstractSamplerGui {
         sampler.setQueueRedeclare(queueRedeclare.isSelected());
         sampler.setQueueAutoDelete(queueAutoDelete.isSelected());
         sampler.setQueueExclusive(queueExclusive.isSelected());
+        sampler.setQueueQuorum(queueQuorum.isSelected());
 
         sampler.setVirtualHost(virtualHost.getText());
         sampler.setHost(host.getText());
@@ -285,6 +289,10 @@ public abstract class AMQPSamplerGui extends AbstractSamplerGui {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         queueSettings.add(queueExclusive, gridBagConstraints);
+
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        queueSettings.add(queueQuorum, gridBagConstraints);
 
         gridBagConstraintsCommon.gridx = 0;
         gridBagConstraintsCommon.gridy = 0;
