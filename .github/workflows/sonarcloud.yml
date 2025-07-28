@@ -11,6 +11,9 @@ on:
     paths-ignore:
       - '**/*.md'
       - 'docs/**'
+  schedule:
+  - cron: "0 5 15 * *"
+  workflow_dispatch:
 
 jobs:
   sonarcloud:
