@@ -1,6 +1,7 @@
-package com.zeroclue.jmeter.protocol.amqp.gui;
+package org.example.amqp_consumer;
 
-import com.zeroclue.jmeter.protocol.amqp.AMQPPublisher;
+
+//import com.zeroclue.jmeter.protocol.amqp.AMQPPublisher;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -36,7 +37,8 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
     private final JLabeledTextField contentType = new JLabeledTextField("        Content-Type");
     private final JLabeledTextField contentEncoding = new JLabeledTextField("Content Encoding");
     private final JLabeledTextField appId = new JLabeledTextField("       Application ID");
-
+    private final JLabeledTextField xQueueMode = new JLabeledTextField("   x-queue-mode");
+    private final JLabeledTextField xOverflow = new JLabeledTextField("   x-overflow");
     private final JCheckBox timestamp = new JCheckBox("Timestamp", AMQPPublisher.DEFAULT_TIMESTAMP);
     private final JCheckBox persistent = new JCheckBox("Persistent", AMQPPublisher.DEFAULT_PERSISTENT);
     private final JCheckBox useTx = new JCheckBox("Use Transactions", AMQPPublisher.DEFAULT_USE_TX);
@@ -84,6 +86,8 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
         replyToQueue.setText(sampler.getReplyToQueue());
         contentType.setText(sampler.getContentType());
         contentEncoding.setText(sampler.getContentEncoding());
+        xQueueMode.setText(sampler.getXqmode());
+        xOverflow.setText(sampler.getXOverFlow());
         correlationId.setText(sampler.getCorrelationId());
         messagePriority.setText(sampler.getMessagePriority());
         messageId.setText(sampler.getMessageId());
@@ -126,6 +130,8 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
         sampler.setCorrelationId(correlationId.getText());
         sampler.setMessagePriority(messagePriority.getText());
         sampler.setContentType(contentType.getText());
+        sampler.setXqmode(xQueueMode.getText());
+        sampler.setXOverFlow(xOverflow.getText());
         sampler.setContentEncoding(contentEncoding.getText());
         sampler.setMessageId(messageId.getText());
         sampler.setAppId(appId.getText());
@@ -199,6 +205,8 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
         propertyPanel.add(appId, constraints);
         propertyPanel.add(contentType, constraints);
         propertyPanel.add(contentEncoding, constraints);
+        propertyPanel.add(xQueueMode, constraints);
+        propertyPanel.add(xOverflow, constraints);
         propertyPanel.add(timestamp, constraints);
 
         return propertyPanel;
@@ -220,6 +228,8 @@ public class AMQPPublisherGui extends AMQPSamplerGui {
         messagePriority.setText("");
         contentType.setText(AMQPPublisher.DEFAULT_CONTENT_TYPE);
         contentEncoding.setText(AMQPPublisher.DEFAULT_ENCODING);
+        xQueueMode.setText(AMQPPublisher.DEFAULT_XQMODE);
+        xOverflow.setText(AMQPPublisher.DEFAULT_XOVERFLOW);
         messageId.setText("");
         message.setText("");
         appId.setText("");
