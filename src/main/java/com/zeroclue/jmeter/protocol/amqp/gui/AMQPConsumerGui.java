@@ -1,6 +1,4 @@
-package com.zeroclue.jmeter.protocol.amqp.gui;
-
-import com.zeroclue.jmeter.protocol.amqp.AMQPConsumer;
+package org.example.amqp_consumer;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -18,6 +16,8 @@ public class AMQPConsumerGui extends AMQPSamplerGui {
 
     private final JLabeledTextField receiveTimeout = new JLabeledTextField("Receive Timeout");
     private final JLabeledTextField prefetchCount = new JLabeledTextField("   Prefetch Count");
+    private final JLabeledTextField xQueueMode = new JLabeledTextField("   x-queue-mode");
+    private final JLabeledTextField xOverflow = new JLabeledTextField("   x-overflow");
 
     private final JCheckBox purgeQueue = new JCheckBox("Purge Queue", AMQPConsumer.DEFAULT_PURGE_QUEUE);
     private final JCheckBox autoAck = new JCheckBox("Auto ACK", AMQPConsumer.DEFAULT_AUTO_ACK);
@@ -58,6 +58,8 @@ public class AMQPConsumerGui extends AMQPSamplerGui {
 
         mainPanel.add(receiveTimeout);
         mainPanel.add(prefetchCount);
+        mainPanel.add(xQueueMode);
+        mainPanel.add(xOverflow);
         mainPanel.add(optionsPanel);
 
         optionsPanel.setPreferredSize(optionsPanel.getPreferredSize());
@@ -77,6 +79,8 @@ public class AMQPConsumerGui extends AMQPSamplerGui {
 
         readResponse.setSelected(sampler.getReadResponseAsBoolean());
         prefetchCount.setText(sampler.getPrefetchCount());
+        xQueueMode.setText(sampler.getXqmode());
+        xOverflow.setText(sampler.getXOverFlow());
         receiveTimeout.setText(sampler.getReceiveTimeout());
         purgeQueue.setSelected(sampler.purgeQueue());
         autoAck.setSelected(sampler.autoAck());
@@ -91,6 +95,8 @@ public class AMQPConsumerGui extends AMQPSamplerGui {
         super.clearGui();
         readResponse.setSelected(AMQPConsumer.DEFAULT_READ_RESPONSE);
         prefetchCount.setText(AMQPConsumer.DEFAULT_PREFETCH_COUNT_STRING);
+        xQueueMode.setText(AMQPConsumer.DEFAULT_XQMODE_STRING);
+        xOverflow.setText(AMQPConsumer.DEFAULT_XOVERFLOW_STRING);
         useTx.setSelected(AMQPConsumer.DEFAULT_USE_TX);
         receiveTimeout.setText(AMQPConsumer.DEFAULT_RECEIVE_TIMEOUT);
         purgeQueue.setSelected(AMQPConsumer.DEFAULT_PURGE_QUEUE);
@@ -122,6 +128,8 @@ public class AMQPConsumerGui extends AMQPSamplerGui {
         sampler.setReadResponse(readResponse.isSelected());
         sampler.setPrefetchCount(prefetchCount.getText());
         sampler.setReceiveTimeout(receiveTimeout.getText());
+        sampler.setXqmode(xQueueMode.getText());
+        sampler.setXOverFlow(xOverflow.getText());
         sampler.setPurgeQueue(purgeQueue.isSelected());
         sampler.setAutoAck(autoAck.isSelected());
         sampler.setUseTx(useTx.isSelected());

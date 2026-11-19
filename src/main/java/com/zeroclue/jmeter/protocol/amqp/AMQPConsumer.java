@@ -1,4 +1,5 @@
-package com.zeroclue.jmeter.protocol.amqp;
+package org.example.amqp_consumer;
+
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.ConsumerCancelledException;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -31,14 +33,17 @@ public class AMQPConsumer extends AMQPSampler implements Interruptible, TestStat
     private static final Logger log = LoggerFactory.getLogger(AMQPConsumer.class);
 
     private static final Map<Class<? extends Exception>, String> EXCEPTION_TO_RESPONSE_CODE = Maps.of(
-        IOException.class, "100",
-        InterruptedException.class, "200",
-        ConsumerCancelledException.class, "300",
-        ShutdownSignalException.class, "400"
+            IOException.class, "100",
+            InterruptedException.class, "200",
+            ConsumerCancelledException.class, "300",
+            ShutdownSignalException.class, "400"
     );
 
     //++ These are JMX names, and must not be changed
     private static final String PREFETCH_COUNT          = "AMQPConsumer.PrefetchCount";
+
+    private static final String XQMODE          = "AMQPConsumer.xQueueMode";
+    private static final String XOVERFLOW          = "AMQPConsumer.xOverflow";
     private static final String READ_RESPONSE           = "AMQPConsumer.ReadResponse";
     private static final String PURGE_QUEUE             = "AMQPConsumer.PurgeQueue";
     private static final String AUTO_ACK                = "AMQPConsumer.AutoAck";
@@ -56,9 +61,19 @@ public class AMQPConsumer extends AMQPSampler implements Interruptible, TestStat
     public static final boolean DEFAULT_READ_RESPONSE = true;
     public static final boolean DEFAULT_USE_TX = false;
     private static final int DEFAULT_PREFETCH_COUNT = 0;    // unlimited
+
+    private static final String DEFAULT_XQ_MODE = "";
+
+    private static final String DEFAULT_XOVERFLOW = "";
     public static final String DEFAULT_PREFETCH_COUNT_STRING = Integer.toString(DEFAULT_PREFETCH_COUNT);
+    public static final String DEFAULT_XQMODE_STRING = DEFAULT_XQ_MODE;
+
+    public static final String DEFAULT_XOVERFLOW_STRING = DEFAULT_XOVERFLOW;
     public static final String DEFAULT_RESPONSE_CODE = "500";
     public static final String DEFAULT_RECEIVE_TIMEOUT = "";
+
+    public String DEFAULT_X_QUEUE_MODE_STRING = "lazy";
+    public String DEFAULT_X_OVERFLOW_STRING = "reject-publish";
 
     private transient Channel channel;
     private transient DeliverCallback consumer;
@@ -107,58 +122,67 @@ public class AMQPConsumer extends AMQPSampler implements Interruptible, TestStat
         /*
          * Perform the sampling
          */
-
-        // aggregate samples
+// Perform the sampling
         int loop = getIterationsAsInt();
-        result.sampleStart();                      // start timing
-        Delivery delivery = null;
+        result.sampleStart(); // start timing
+        Delivery delivery=null;
+
+        boolean messageFound = false; // Flag to indicate if a message is found
 
         try {
             for (int idx = 0; idx < loop; idx++) {
                 delivery = response.poll(getReceiveTimeoutAsInt(), TimeUnit.MILLISECONDS);
 
-                if (delivery == null) {
-                    result.setResponseMessage("Timed out");
-                    return result;
+                if (delivery != null) {
+                    messageFound = true; // Set flag to true if a message is found
+
+                    /*
+                     * Set up the sample result details
+                     */
+                    if (getReadResponseAsBoolean()) {
+                        String responseStr = new String(delivery.getBody());
+                        result.setResponseData(responseStr, StandardCharsets.UTF_8.name());
+                    } else {
+                        result.setResponseData("Read response failed", StandardCharsets.UTF_8.name());
+                    }
+
+                    if (!autoAck()) {
+                        channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+                    }
+                }
+            }
+
+            // If no messages found, set the result as successful
+            if (!messageFound) {
+                result.setResponseMessage("No Messages in the queue");
+                result.setResponseCodeOK();
+                result.setSuccessful(true);
+            } else {
+                // commit the sample
+                if (getUseTx()) {
+                    channel.txCommit();
                 }
 
                 /*
                  * Set up the sample result details
                  */
-                if (getReadResponseAsBoolean()) {
-                    String responseStr = new String(delivery.getBody());
-                    result.setResponseData(responseStr, StandardCharsets.UTF_8.name());
-                } else {
-                    result.setResponseData("Read response failed", StandardCharsets.UTF_8.name());
-                }
+                result.setDataType(SampleResult.TEXT);
+                result.setResponseHeaders(delivery != null ? formatHeaders(delivery) : null);
 
-                if (!autoAck()) {
-                    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-                }
+                result.setResponseMessage("OK");
+                result.setResponseCodeOK();
+                result.setSuccessful(true);
             }
 
-            // commit the sample
-            if (getUseTx()) {
-                channel.txCommit();
-            }
-
-            /*
-             * Set up the sample result details
-             */
-            result.setDataType(SampleResult.TEXT);
-            result.setResponseHeaders(delivery != null ? formatHeaders(delivery) : null);
-
-            result.setResponseMessage("OK");
-            result.setResponseCodeOK();
-            result.setSuccessful(true);
         } catch(InterruptedException ie) {
-            Thread.currentThread().interrupt();     // re-interrupt the current thread
+            Thread.currentThread().interrupt(); // re-interrupt the current thread
             response = null;
             consumer = null;
             consumerTag = null;
             log.warn("Interrupted while attempting to consume", ie);
             result.setResponseCode(EXCEPTION_TO_RESPONSE_CODE.get(ie.getClass()));
             result.setResponseMessage(ie.getMessage());
+
         } catch (ShutdownSignalException | ConsumerCancelledException | IOException e) {
             response = null;
             consumer = null;
@@ -168,7 +192,7 @@ public class AMQPConsumer extends AMQPSampler implements Interruptible, TestStat
             result.setResponseMessage(e.getMessage());
             interrupt();
         } finally {
-            result.sampleEnd();         // end timing
+            result.sampleEnd(); // end timing
         }
 
         trace("AMQPConsumer.sample ended");
@@ -257,7 +281,27 @@ public class AMQPConsumer extends AMQPSampler implements Interruptible, TestStat
         setProperty(PREFETCH_COUNT, prefetchCount);
     }
 
+    public String getXqmode() {
+        return getPropertyAsString(XQMODE, DEFAULT_X_QUEUE_MODE_STRING);
+    }
+
+    public void setXqmode(String xqmode) {
+        setProperty(XQMODE, xqmode);
+    }
+
+    public String getXOverFlow() {
+        return getPropertyAsString(XOVERFLOW, DEFAULT_X_OVERFLOW_STRING);
+    }
+
+    public void setXOverFlow(String xOverFlow) {
+        setProperty(XOVERFLOW, xOverFlow);
+    }
+
     public int getPrefetchCountAsInt() {
+        return getPropertyAsInt(PREFETCH_COUNT);
+    }
+
+    public int getPrefetchCount1AsInt() {
         return getPropertyAsInt(PREFETCH_COUNT);
     }
 
@@ -328,16 +372,22 @@ public class AMQPConsumer extends AMQPSampler implements Interruptible, TestStat
     @Override
     public void cleanup() {
         try {
-            if (consumerTag != null) {
-                channel.basicCancel(consumerTag);
+            if (channel != null && channel.isOpen()) {
+                if (consumerTag != null) {
+                    channel.basicCancel(consumerTag);
+                    log.info("Cancelled consumer tag: {}", consumerTag);
+                }
+                channel.close();
+                log.info("Closed channel");
             }
-        } catch (IOException e) {
-            log.error("Couldn't safely cancel the sample {}", consumerTag, e);
+        } catch (Exception e) {
+            log.error("Failed to clean up resources", e);
+        }finally{
+            super.cleanup();
         }
 
-        super.cleanup();
-    }
 
+    }
     /**
      * Helper method.
      */
@@ -366,37 +416,41 @@ public class AMQPConsumer extends AMQPSampler implements Interruptible, TestStat
 
         if (delivery.getProperties().getTimestamp() != null) {
             sb.append(TIMESTAMP_PARAMETER)
-                .append(": ")
-                .append((delivery.getProperties().getTimestamp().getTime())/1000)
-                .append("\n");
+                    .append(": ")
+                    .append((delivery.getProperties().getTimestamp().getTime())/1000)
+                    .append("\n");
         }
 
         sb.append(EXCHANGE_PARAMETER)
-            .append(": ")
-            .append(delivery.getEnvelope().getExchange())
-            .append("\n");
+                .append(": ")
+                .append(delivery.getEnvelope().getExchange())
+                .append("\n");
+//        sb.append(x_queue_mode)
+//                .append(": ")
+//                .append(delivery.getEnvelope().get)
+//                .append("\n");
         sb.append(ROUTING_KEY_PARAMETER)
-            .append(": ")
-            .append(delivery.getEnvelope().getRoutingKey())
-            .append("\n");
+                .append(": ")
+                .append(delivery.getEnvelope().getRoutingKey())
+                .append("\n");
         sb.append(DELIVERY_TAG_PARAMETER)
-            .append(": ")
-            .append(delivery.getEnvelope().getDeliveryTag())
-            .append("\n");
+                .append(": ")
+                .append(delivery.getEnvelope().getDeliveryTag())
+                .append("\n");
 
         if (delivery.getProperties().getAppId() != null) {
             sb.append(APP_ID_PARAMETER)
-                .append(": ")
-                .append(delivery.getProperties().getAppId())
-                .append("\n");
+                    .append(": ")
+                    .append(delivery.getProperties().getAppId())
+                    .append("\n");
         }
 
         if (headers != null) {
             for (Map.Entry<String,Object> entry : headers.entrySet()) {
                 sb.append(entry.getKey())
-                    .append(": ")
-                    .append(entry.getValue())
-                    .append("\n");
+                        .append(": ")
+                        .append(entry.getValue())
+                        .append("\n");
             }
         }
 

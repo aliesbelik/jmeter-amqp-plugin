@@ -1,4 +1,5 @@
-package com.zeroclue.jmeter.protocol.amqp;
+package org.example.amqp_consumer;
+
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AMQPPublisher extends AMQPSampler implements Interruptible {
 
+    public static final String DEFAULT_XOVERFLOW = "";
     private static final long serialVersionUID = -8420658040465788497L;
 
     private static final Logger log = LoggerFactory.getLogger(AMQPPublisher.class);
@@ -53,6 +55,9 @@ public class AMQPPublisher extends AMQPSampler implements Interruptible {
     private static final String PERSISTENT          = "AMQPPublisher.Persistent";
     private static final String USE_TX              = "AMQPPublisher.UseTx";
     private static final String APP_ID              = "AMQPPublisher.AppId";
+
+    private static final String XQMODE          = "AMQPConsumer.xQueueMode";
+    private static final String XOVERFLOW          = "AMQPConsumer.xOverflow";
     private static final String TIMESTAMP           = "AMQPPublisher.Timestamp";
 
     public static final boolean DEFAULT_PERSISTENT   = false;
@@ -63,6 +68,16 @@ public class AMQPPublisher extends AMQPSampler implements Interruptible {
     public static final String DEFAULT_CONTENT_TYPE  = "text/plain";
     public static final String DEFAULT_ENCODING      = "utf-8";
 
+    private static final String DEFAULT_XQ_MODE = "";
+
+//    private static final String DEFAULT_XOVERFLOW = "";
+
+    public static final String DEFAULT_XQMODE_STRING = DEFAULT_XQ_MODE;
+
+    public static final String DEFAULT_XOVERFLOW_STRING = DEFAULT_XOVERFLOW;
+
+    public String DEFAULT_X_QUEUE_MODE_STRING = "lazy";
+    public String DEFAULT_X_OVERFLOW_STRING = "reject-publish";
     private transient Channel channel;
 
     public AMQPPublisher() {
@@ -272,6 +287,20 @@ public class AMQPPublisher extends AMQPSampler implements Interruptible {
     public void setAppId(String appId) {
         setProperty(APP_ID, appId);
     }
+    public String getXqmode() {
+        return getPropertyAsString(XQMODE);
+    }
+
+    public void setXqmode(String xqmode) {
+        setProperty(XQMODE, xqmode);
+    }
+    public String getXoverflow() {
+        return getPropertyAsString(XOVERFLOW);
+    }
+
+    public void setXoverflow(String xOverFlow) {
+        setProperty(XOVERFLOW, xOverFlow);
+    }
 
     public boolean getTimestamp() {
         return getPropertyAsBoolean(TIMESTAMP, DEFAULT_TIMESTAMP);
@@ -303,12 +332,12 @@ public class AMQPPublisher extends AMQPSampler implements Interruptible {
         final String contentType = StringUtils.defaultIfEmpty(getContentType(), DEFAULT_CONTENT_TYPE);
 
         builder.contentType(contentType)
-            .contentEncoding(getContentEncoding())
-            .deliveryMode(deliveryMode)
-            .correlationId(getCorrelationId())
-            .replyTo(getReplyToQueue())
-            .type(getMessageType())
-            .headers(prepareHeaders());
+                .contentEncoding(getContentEncoding())
+                .deliveryMode(deliveryMode)
+                .correlationId(getCorrelationId())
+                .replyTo(getReplyToQueue())
+                .type(getMessageType())
+                .headers(prepareHeaders());
 
         if (getMessageId() != null && !getMessageId().isEmpty()) {
             builder.messageId(getMessageId());
@@ -345,6 +374,7 @@ public class AMQPPublisher extends AMQPSampler implements Interruptible {
     private Map<String, Object> prepareHeaders() {
         Arguments headers = getHeaders();
 
+
         if (headers != null) {
             return new HashMap<>(headers.getArgumentsAsMap());
         }
@@ -358,9 +388,9 @@ public class AMQPPublisher extends AMQPSampler implements Interruptible {
 
         for (Map.Entry<String,String> entry : headers.entrySet()) {
             sb.append(entry.getKey())
-                .append(": ")
-                .append(entry.getValue())
-                .append("\n");
+                    .append(": ")
+                    .append(entry.getValue())
+                    .append("\n");
         }
 
         return sb.toString();
